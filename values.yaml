@@ -1,0 +1,96 @@
+---
+## Set default image, imageTag, and imagePullPolicy. 
+## ref: https://hub.docker.com/_/postgres
+##
+image:
+  repository: postgres
+  tag: "11.5"
+  pullPolicy: IfNotPresent
+
+  ## Optionally specify an imagePullSecret.
+  ## Secret must be manually created in the namespace.
+  ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  ##
+  # pullSecret: myRegistrKeySecretName
+
+## Expose the nifi service to be accessed from outside the cluster (LoadBalancer service).
+## or access it from within the cluster (ClusterIP service). Set the service type and the port to serve it.
+## ref: http://kubernetes.io/docs/user-guide/services/
+##
+service:
+  type: ClusterIP
+  annotations: {}
+  ## loadBalancerIP
+  ## loadBalancerSourceRanges
+  ## clusterIP
+
+## Postgresql values
+
+postgresql:
+  username: postgres
+  password: postgres
+  database: postgres
+  port: 5432
+  # initdbArgs 
+  # initdbWalDir
+  # dataDir
+
+# extraEnv
+
+## Enable persistence using Persistent Volume Claims
+## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
+##
+persistence:
+  enabled: false
+  # mounthPath
+
+  # When creating persistent storage, the NiFi helm chart can either reference an already-defined
+  # storage class by name, such as "standard" or can define a custom storage class by specifying
+  # customStorageClass: true and providing the "storageClass", "storageProvisioner" and "storageType".
+  # For example, to use SSD storage on Google Compute Engine see values-gcp.yaml
+  #
+  # To use a storage class that already exists on the Kubernetes cluster, we can simply reference it by name.
+  # For example:
+  # storageClass: standard
+  #
+  storageClass: standard
+  accessModes:  [ReadWriteOnce]
+  ## Storage Capacity for persistent volume
+  size: 5Gi
+
+## Configure liveness and readiness probes
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/
+##
+#readinessProbe:
+#  httpGet:
+#    path: /
+#    port: http
+#  initialDelaySeconds: 60
+#  periodSeconds: 15
+#  timeoutSeconds: 10
+#livenessProbe:
+#   httpGet:
+#     path: /
+#     port: http
+#   initialDelaySeconds: 60
+#   periodSeconds: 30
+#   timeoutSeconds: 10
+
+## Configure resource requests and limits
+## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+##
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #  cpu: 100m
+  #  memory: 128Mi
+  # requests:
+  #  cpu: 100m
+  #  memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []

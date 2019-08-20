@@ -1,0 +1,61 @@
+---
+apiVersion: apps/v1beta2
+kind: StatefulSet
+metadata:
+  name: {{ template "postgresql.fullname" . }}
+  labels:
+    app: {{ include "postgresql.name" . }}
+    chart: {{ template "postgresql.chart" . }}
+    release: {{ .Release.Name | quote }}
+    heritage: {{ .Release.Service | quote }}
+spec:
+  serviceName: {{ template "postgresql.fullname" . }}-headless
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ template "postgresql.name" . }}
+      release: {{ .Release.Name | quote }}
+  template:
+    metadata:
+      name: {{ template "postgresql.fullname" . }}
+      labels:
+        app: {{ include "postgresql.name" . | quote }}
+        chart: {{ template "postgresql.chart" . }}
+        release: {{ .Release.Name | quote }}
+        heritage: {{ .Release.Service | quote }}
+    spec:
+      containers:
+      - name: {{ template "postgresql.fullname" . }}
+        image: {{ .Values.image.repository | quote }}
+        imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
+        resources:
+{{ toYaml .Values.resources | indent 10 }}
+        env:
+        - name: POSTGRES_PASSWORD
+          value: {{ .Values.postgresql.password | quote }}
+        - name: POSTGRES_USER
+          value: {{ .Values.postgresql.username | quote }}
+        - name: POSTGRES_DB
+          value: {{ .Values.postgresql.database | quote }}
+        {{- if .Values.postgresql.initdbArgs }}
+        - name: POSTGRES_INITDB_ARGS
+          value: {{ .Values.postgresql.initdbArgs | quote }}
+        {{- end }}
+        {{- if .Values.postgresql.initdbWalDir }}
+        - name: POSTGRES_INITDB_WALDIR
+          value: {{ .Values.postgresql.initdbWalDir | quote }}
+        {{- end }}
+        {{- if .Values.persistence.mountPath }}
+        - name: PGDATA
+          value: {{ .Values.postgresql.dataDir | quote }}
+        {{- end }}
+{{- if .Values.extraEnv }}
+{{ tpl (toYaml .Values.extraEnv) $ | indent 8 }}
+{{- end }}
+        ports:
+        - name: postgresql
+          containerPort: {{ .Values.postgresql.port }}
+          livenessProbe:
+{{ toYaml .Values.livenessProbe | indent 12 }}
+          readinessProbe:
+{{ toYaml .Values.readinessProbe | indent 12 }}
