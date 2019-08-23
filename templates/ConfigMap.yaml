@@ -1,0 +1,23 @@
+#
+# A ConfigMap spec for pgldap-config.yaml 
+# /var/lib/pglda-config.yaml
+#
+{{- if .Values.pgldap-config }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "postgres.fullname" . }}-pgldap-config
+  labels:
+    app: {{ template "postgres.name" . }}
+    chart: {{ template "postgres.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+{{- if .Values.extraLabels }}
+{{ toYaml .Values.extraLabels | indent 4 }}
+{{- end }}
+data:
+{{- range $key, $val := .Values.pgldap-config }}
+  {{ $key }}: |-
+{{ $val | indent 4}}
+{{- end }}
+{{- end }}
