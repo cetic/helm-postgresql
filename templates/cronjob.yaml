@@ -1,27 +1,32 @@
 ---
+{{- if and .Values.ldap.enabled .Values.ldap.pgldapconfig }}
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
   name: pg-ldap-sync
 spec:
-  schedule: 0 */1 * * ?
+  schedule: {{ .Values.ldap.cron.schedule | quote}} 
   jobTemplate:
     metadata:
       labels:
-        app: {{ $release_name }}
-        cron: {{ $job.name }}
+        app: {{ .Release.Name | quote }}
     spec:
       template:
         spec:
           containers:
           - name: pg-ldap-sync
-            image: ceticasbl/pg-ldap-sync:latest
-            args: [ "/var/lib/pgldap-config.yaml", "-vv"]
-          restartPolicy: OnFailure
+            image: {{ .Values.ldap.cron.repo }}:{{ .Values.ldap.cron.tag }}
+            ##args: [ "/var/lib/pgldap-config.yaml", "-vv"]
+          restartPolicy: {{ .Values.ldap.cron.restartPolicy }}
           volumeMounts:
           - name: pgldap-config
-            mountPath: /var/lib
+            mountPath: {{ .Values.ldap.cron.mountPath }}
+            subPath: {{ .Values.ldap.cron.subPath }}
           volumes:
           - name: pgldap-config
             configMap:
-              name: pgldap-config
+              name: {{ template "postgresql.fullname" . }}-pgldap-config
+              items:
+              - key: pgldap-config.yaml
+                path: pgldap-config.yaml
+{{end}}

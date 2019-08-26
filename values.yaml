@@ -91,6 +91,66 @@ volumePermissions:
   securityContext:
     runAsUser: 0
 
+ldap:
+  enabled: true
+  pgldapconfig: |-
+
+    # Reference: https://github.com/larskanis/pg-ldap-sync/blob/master/config/sample-config.yaml
+
+    # Connection parameters to LDAP server
+    ldap_connection:
+      host: rodc.ext.cetic.be
+      port: 389
+      auth:
+        method: :simple
+        username: OU=People,DC=ad,DC=cetic,DC=be
+        password: test
+
+      # Search parameters for LDAP users which should be synchronized
+    ldap_users:
+      base: OU=People,DC=ad,DC=cetic,DC=be
+      # LDAP filter (according to RFC 2254)
+      # defines to users in LDAP to be synchronized
+      filter: (cn=*)
+      # this attribute is used as PG role name
+      name_attribute: cn
+      # lowercase name for use as PG role name
+      lowercase_name: true
+    ldap_groups:
+        base: ou=Groups,DC=example,DC=be
+        filter: (|(cn=group1)(cn=group2)(cn=group3))
+        # this attribute is used as PG role name
+        name_attribute: cn
+        # this attribute must reference to all member DN's of the given group
+        member_attribute: member
+    # Connection parameters to PostgreSQL server
+    # see also: http://rubydoc.info/gems/pg/PG/Connection#initialize-instance_method
+    pg_connection:
+      host:
+      dbname: postgres # the db name is usually "postgres"
+      user: postgres # the user name is usually "postgres"
+      password: postgres # kubectl get secret --namespace fadi <pod_name> -o jsonpath="{.data.postgresql-password}" | base64 --decode
+    pg_users:
+      # Filter for identifying LDAP generated users in the database.
+      # It's the WHERE-condition to "SELECT rolname, oid FROM pg_roles"
+      filter: rolcanlogin AND NOT rolsuper
+      # Options for CREATE RULE statements
+      create_options: LOGIN
+    pg_groups:
+      # Filter for identifying LDAP generated groups in the database.
+      # It's the WHERE-condition to "SELECT rolname, oid FROM pg_roles"
+      filter: NOT rolcanlogin AND NOT rolsuper
+      # Options for CREATE RULE statements
+      create_options: NOLOGIN
+      grant_options:
+
+  cron:
+    schedule: "*/1 * * * *"
+    repo: ceticasbl/pg-ldap-sync 
+    tag: latest
+    restartPolicy: Never
+    mountPath: /var/lib
+    subPath: pgldap-config.yaml
 
 ## Pod Security Context
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
