@@ -20,9 +20,18 @@ image:
 service:
   type: ClusterIP
   annotations: {}
-  ## loadBalancerIP
-  ## loadBalancerSourceRanges
-  ## clusterIP
+  ## clusterIP:
+
+  ## Set the LoadBalancer service type to internal only.
+  ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#internal-load-balancer
+  ##
+  # loadBalancerIP:
+
+  ## Load Balancer sources
+  ## https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service
+  ##
+  # loadBalancerSourceRanges:
+  # - 10.10.10.0/24
 
 ## Postgresql values
 
@@ -33,30 +42,75 @@ postgresql:
   port: 5432
   # initdbArgs 
   # initdbWalDir
-  # dataDir
-
+  dataDir: /var/lib/postgresql/data
 # extraEnv
+
+  ## PostgreSQL configuration
+  ## Specify runtime configuration parameters as a dict, using camelCase, e.g.
+  ## {"sharedBuffers": "500MB"}
+  ## Alternatively, you can put your postgresql.conf under the configs/ directory
+  ## ref: https://www.postgresql.org/docs/current/static/runtime-config.html
+  ##
+  # config:
+
+  ## PostgreSQL client authentication configuration
+  ## Specify content for pg_hba.conf
+  ## Default: do not create pg_hba.conf
+  ## Alternatively, you can put your pg_hba.conf under the files/ directory
+  # pghba: |-
+  #   local all all trust
+  #   host all all localhost trust
+  #   host mydatabase mysuser 192.168.0.0/24 md5
+
+  ## ConfigMap with PostgreSQL configuration
+  ## NOTE: This will override postgresql.config and postgresql.pghba
+  # configMap:
+
+##
+## Init containers parameters:
+## volumePermissions: Change the owner of the persist volume mountpoint to RunAsUser:fsGroup
+##
+volumePermissions:
+  enabled: true
+  image:
+    registry: docker.io
+    repository: bitnami/minideb
+    tag: latest
+    ## Specify a imagePullPolicy
+    ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
+    ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+    ##
+    pullPolicy: Always
+    ## Optionally specify an array of imagePullSecrets.
+    ## Secrets must be manually created in the namespace.
+    ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+    ##
+    # pullSecrets:
+    #   - myRegistryKeySecretName
+  ## Init container Security Context
+  securityContext:
+    runAsUser: 0
+
+
+## Pod Security Context
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+##
+securityContext:
+  enabled: true
+  fsGroup: 1001
+  runAsUser: 1001
 
 ## Enable persistence using Persistent Volume Claims
 ## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
 ##
 persistence:
-  enabled: false
-  # mounthPath
-
-  # When creating persistent storage, the NiFi helm chart can either reference an already-defined
-  # storage class by name, such as "standard" or can define a custom storage class by specifying
-  # customStorageClass: true and providing the "storageClass", "storageProvisioner" and "storageType".
-  # For example, to use SSD storage on Google Compute Engine see values-gcp.yaml
-  #
-  # To use a storage class that already exists on the Kubernetes cluster, we can simply reference it by name.
-  # For example:
-  # storageClass: standard
-  #
-  storageClass: standard
+  enabled: true
+  mountPath: /var/lib/postgresql
+  subPath: ""
   accessModes:  [ReadWriteOnce]
   ## Storage Capacity for persistent volume
-  size: 5Gi
+  size: 10Gi
+  annotations: {}
 
 ## Configure liveness and readiness probes
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-probes/
