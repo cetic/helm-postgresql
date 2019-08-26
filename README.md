@@ -30,7 +30,7 @@ The following items can be set via `--set` flag during installation or configure
 - **NodePort**: Exposes the service on each Node’s IP at a static port (the NodePort). You’ll be able to contact the NodePort service, from outside the cluster, by requesting `NodeIP:NodePort`.
 - **LoadBalancer**: Exposes the service externally using a cloud provider’s load balancer.
 
-#### Configure the way how to persistent data: (TODO)
+#### Configure the way how to persistent data:
 
 - **Disable**: The data does not survive the termination of a pod.
 - **Persistent Volume Claim(default)**: A default `StorageClass` is needed in the Kubernetes cluster to dynamic provision the volumes. Specify another StorageClass in the `storageClass` or set `existingClaim` if you have already existing persistent volumes to use.
@@ -64,20 +64,37 @@ The following table lists the configurable parameters of the postgresql chart an
 | `image.pullSecret`                                                          | postgresql Image pull secret                                                                                       | `nil`                           |
 | **postgresql properties**                                                   |
 | `postgresql.username`                                                       | postgresql username                                                                                                | `postgres`                      |
-| `postgresql.password`                                                       | postgresql password                                                                                                | `true`                          |
-| `postgresql.database`                                                       | postgresql database                                                                                                | `8080`                          |
-| `postgresql.port`                                                           | postgresql port                                                                                                    | `null`                          |
+| `postgresql.password`                                                       | postgresql password                                                                                                | `postgres`                      |
+| `postgresql.database`                                                       | postgresql database                                                                                                | `postgres`                      |
+| `postgresql.port`                                                           | postgresql port                                                                                                    | `5432`                          |
+| `postgresql.dataDir`                                                        | PostgreSQL data dir folder                                                                                         | `/var/lib/postgresql/data`      |
+| `postgresql.config`                                                         | Runtime Config Parameters                                                                                          | `nil`                           |
+| `postgresql.pghba`                                                          | Content of pg\_hba.conf                                                                                            | `nil (do not create pg_hba.conf)`|
+| `postgresql.configMap`                                                      | ConfigMap with the PostgreSQL configuration files (Note: Overrides `postgresqlConfiguration` and `pgHbaConfiguration`). The value is evaluated as a template. | `nil`|
+| `extraEnv`                                                                  | Any extra environment variables you would like to pass on to the pod. The value is evaluated as a template.        | `{}`                            |
 | **Service**                                                                 |
 | `service.type`                                                              | Type of service for postgresql frontend                                                                            | `CusterIP`                      |
 | `service.loadBalancerIP`                                                    | LoadBalancerIP if service type is `LoadBalancer`                                                                   | `nil`                           |
 | `service.clusterIP`                                                         | ClusterIP if service type is `ClusterIP`                                                                           | `nil`                           |
 | `service.loadBalancerSourceRanges`                                          | Address that are allowed when svc is `LoadBalancer`                                                                | `[]`                            |
 | `service.annotations`                                                       | Service annotations                                                                                                | `{}`                            |
-| **Persistence (TODO)**                                                      |
+| **Volume Permissions**                                                      |
+| `volumePermissions.image.registry`                                          | Init container volume-permissions image registry                                                                   | `docker.io`                     |
+| `volumePermissions.image.repository`                                        | Init container volume-permissions image name                                                                       | `bitnami/minideb`               |
+| `volumePermissions.image.tag`                                               | Init container volume-permissions image tag                                                                        | `latest`                        |
+| `volumePermissions.image.pullPolicy`                                        | Init container volume-permissions image pull policy                                                                | `Always`                        |
+| `volumePermissions.securityContext.runAsUser`                               | User ID for the init container                                                                                     | `0`                             |
+| **Security Context**                                                        |
+| `securityContext.enabled`                                                   | Enable security context                                                                                            | `true`                          |
+| `securityContext.fsGroup`                                                   | Group ID for the container                                                                                         | `1001`                          |
+| `securityContext.runAsUser`                                                 | User ID for the container                                                                                          | `1001`                          |
+| **Persistence**                                                             |
 | `persistence.enabled`                                                       | Use persistent volume to store data                                                                                | `false`                         |
+| `persistence.mountPath`                                                     | Path to mount the volume at                                                                                        | `/var/lib/postgresql`           |
+| `persistence.subPath`                                                       | Subdirectory of the volume to mount at                                                                             | `""`                            |
 | `persistence.storageClass`                                                  | Storage class name of PVCs                                                                                         | `standard`                      |
 | `persistence.accessMode`                                                    | ReadWriteOnce or ReadOnly                                                                                          | `[ReadWriteOnce]`               |
-| `persistence.size`                                                          | Size of persistent volume claim                                                                                    | `5Gi`                           |
+| `persistence.size`                                                          | Size of persistent volume claim                                                                                    | `10Gi`                          |
 | **ReadinessProbe**                                                          |
 | `readinessProbe`                                                            | Rediness Probe settings                                                                                            | `nil`                           |
 | **LivenessProbe**                                                           |
@@ -91,8 +108,9 @@ The following table lists the configurable parameters of the postgresql chart an
 
 ## Why this PostgreSQL Helm Chart?
 
-* postgres official Docker Image.
-* TODO
+* use postgres official Docker Image.
+* needed LDAP support for the [FADI](https://github.com/cetic/fadi) project. 
+* ...
 
 ## Contributing
 

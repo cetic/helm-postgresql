@@ -20,9 +20,18 @@ image:
 service:
   type: ClusterIP
   annotations: {}
-  ## loadBalancerIP
-  ## loadBalancerSourceRanges
-  ## clusterIP
+  ## clusterIP:
+
+  ## Set the LoadBalancer service type to internal only.
+  ## ref: https://kubernetes.io/docs/concepts/services-networking/service/#internal-load-balancer
+  ##
+  # loadBalancerIP:
+
+  ## Load Balancer sources
+  ## https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/#restrict-access-for-loadbalancer-service
+  ##
+  # loadBalancerSourceRanges:
+  # - 10.10.10.0/24
 
 ## Postgresql values
 
