@@ -91,7 +91,6 @@ volumePermissions:
   securityContext:
     runAsUser: 0
 
-
 ## Pod Security Context
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
 ##
@@ -99,6 +98,20 @@ securityContext:
   enabled: true
   fsGroup: 1001
   runAsUser: 1001
+
+ldap:
+  enabled: false
+    #pgldapconfig: |-
+    # Reference: https://github.com/larskanis/pg-ldap-sync/blob/master/config/sample-config.yaml
+    # Connection parameters to LDAP server
+
+  cron:
+    schedule: "0 * * * *"
+    repo: ceticasbl/pg-ldap-sync
+    tag: latest
+    restartPolicy: Never
+    mountPath: /workspace
+    subPath: ""
 
 ## Enable persistence using Persistent Volume Claims
 ## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
