@@ -49,6 +49,15 @@ spec:
       containers:
       - name: {{ template "postgresql.fullname" . }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+      {{- if and .Values.postgresql.pghba .Values.postgresql.config}}
+        args: ["-c", "config_file={{ .Values.persistence.mountPath }}/conf/postgresql.conf", "-c", "hba_file={{ .Values.persistence.mountPath }}/conf/pg_hba.conf"]
+      {{- end }}
+      {{- if and (not .Values.postgresql.pghba) .Values.postgresql.config}}
+        args: ["-c", "config_file={{ .Values.persistence.mountPath }}/conf/postgresql.conf"]
+      {{- end }}
+      {{- if and .Values.postgresql.pghba (not .Values.postgresql.config)}}
+        args: ["-c", "hba_file={{ .Values.persistence.mountPath }}/conf/pg_hba.conf"]
+      {{- end }}
         imagePullPolicy: {{ .Values.image.pullPolicy | quote }}
         resources:
 {{ toYaml .Values.resources | indent 10 }}
@@ -86,16 +95,36 @@ spec:
         - name: data
           mountPath: {{ .Values.persistence.mountPath }}
           subPath: {{ .Values.persistence.subPath }}
+          readOnly: false
         {{- end }}
-        {{- if or (.Files.Glob "configs/postgresql.conf") (.Files.Glob "configs/pg_hba.conf") .Values.postgresql.config .Values.postgresql.pghba .Values.configMap }}
+        {{- if or (.Files.Glob "configs/pg_hba.conf") .Values.postgresql.pghba .Values.configMap }}
+        - name: postgresql-config-pghba
+          mountPath: {{ .Values.persistence.mountPath }}/conf/pg_hba.conf
+          subPath: pg_hba.conf
+          readOnly: false
+        {{- end }}
+        {{- if or (.Files.Glob "configs/postgresql.conf") .Values.postgresql.config .Values.configMap }}
         - name: postgresql-config
-          mountPath: {{ .Values.persistence.mountPath }}/conf
+          mountPath: {{ .Values.persistence.mountPath }}/conf/postgresql.conf
+          subPath: postgresql.conf
+          readOnly: false
         {{- end }}
       volumes:
-      {{- if or (.Files.Glob "configs/postgresql.conf") (.Files.Glob "configs/pg_hba.conf") .Values.postgresql.config .Values.postgresql.pghba .Values.postgresql.configMap}}
+      {{- if or (.Files.Glob "configs/pg_hba.conf") .Values.postgresql.pghba .Values.postgresql.configMap}}
+      - name: postgresql-config-pghba
+        configMap:
+          name: {{ template "postgresql.fullname" . }}-configuration
+          items:
+           - key: pg_hba.conf
+             path: pg_hba.conf
+      {{- end }}
+      {{- if or (.Files.Glob "configs/postgresql.conf") .Values.postgresql.config .Values.postgresql.configMap}}
       - name: postgresql-config
         configMap:
           name: {{ template "postgresql.fullname" . }}-configuration
+          items:
+           - key: postgresql.conf
+             path: postgresql.conf
       {{- end }}
 {{- if and .Values.persistence.enabled .Values.persistence.existingClaim }}
       - name: data

@@ -24,7 +24,7 @@ data:
   pg_hba.conf: |
 {{ .Values.postgresql.pghba  | indent 4 }}
 {{- end }}
-{{ end }}
+{{- end }}
 #
 # A ConfigMap spec for pgldap-config.yaml 
 # /var/lib/pglda-config.yaml
