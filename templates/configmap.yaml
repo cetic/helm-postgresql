@@ -30,6 +30,7 @@ data:
 # /var/lib/pglda-config.yaml
 #
 {{- if and .Values.ldap.enabled .Values.ldap.pgldapconfig }}
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
