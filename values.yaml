@@ -34,7 +34,6 @@ service:
   # - 10.10.10.0/24
 
 ## Postgresql values
-
 postgresql:
   username: postgres
   password: postgres
@@ -61,7 +60,9 @@ postgresql:
   #   local all all trust
   #   host all all localhost trust
   #   host mydatabase mysuser 192.168.0.0/24 md5
-
+  #initdbscripts: |-
+    #!/bin/sh
+    #echo "helloworld"
   ## ConfigMap with PostgreSQL configuration
   ## NOTE: This will override postgresql.config and postgresql.pghba
   # configMap:
@@ -91,7 +92,6 @@ volumePermissions:
   securityContext:
     runAsUser: 0
 
-
 ## Pod Security Context
 ## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
 ##
@@ -99,6 +99,66 @@ securityContext:
   enabled: true
   fsGroup: 1001
   runAsUser: 1001
+
+ldap:
+  enabled: true
+  pgldapconfig: |-
+    # Reference: https://github.com/larskanis/pg-ldap-sync/blob/master/config/sample-config.yaml
+    # Connection parameters to LDAP server
+    ldap_connection:
+      host: example.com
+      port: 389
+      auth:
+        method: :simple
+        username: cn=admin,dc=example,dc=com
+        password: -password-goes-here-
+
+      # Search parameters for LDAP users which should be synchronized
+    ldap_users:
+      base: OU=People,dc=example,dc=com
+      # LDAP filter (according to RFC 2254)
+      # defines to users in LDAP to be synchronized
+      filter: (&(objectClass=person)(objectClass=organizationalPerson)(givenName=*)(sn=*))
+      # this attribute is used as PG role name
+      name_attribute: sAMAccountName
+      # lowercase name for use as PG role name
+      lowercase_name: true
+    ldap_groups:
+        base: OU=people,dc=example,dc=com
+        filter: (|(cn=group1)(cn=group2)(cn=group3))
+        # this attribute is used as PG role name
+        name_attribute: cn
+        # this attribute must reference to all member DN's of the given group
+        member_attribute: member
+    # Connection parameters to PostgreSQL server
+    # see also: http://rubydoc.info/gems/pg/PG/Connection#initialize-instance_method
+    pg_connection:
+      host: 
+      dbname: postgres # the db name is usually "postgres"
+      user: postgres # the user name is usually "postgres"
+      password: postgres # kubectl get secret --namespace fadi <pod_name> -o jsonpath="{.data.postgresql-password}" | base64 --decode
+    pg_users:
+      # Filter for identifying LDAP generated users in the database.
+      # It's the WHERE-condition to "SELECT rolname, oid FROM pg_roles"
+      filter: rolcanlogin AND NOT rolsuper
+      # Options for CREATE RULE statements
+      create_options: LOGIN
+    pg_groups:
+      # Filter for identifying LDAP generated groups in the database.
+      # It's the WHERE-condition to "SELECT rolname, oid FROM pg_roles"
+      filter: NOT rolcanlogin AND NOT rolsuper
+      # Options for CREATE RULE statements
+      create_options: NOLOGIN
+      grant_options:
+
+  cron:
+    schedule: "*/1 * * * *"
+    repo: ceticasbl/pg-ldap-sync
+    #repo: ayadi05/pgldaptest
+    tag: latest
+    restartPolicy: Never
+    mountPath: /workspace
+    subPath: ""
 
 ## Enable persistence using Persistent Volume Claims
 ## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
@@ -132,6 +192,11 @@ persistence:
 
 ## Configure resource requests and limits
 ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
+##
+
+## initdb scripts
+## Specify dictionary of scripts to be run at first boot
+## Alternatively, you can put your scripts under the files/docker-entrypoint-initdb.d directory
 ##
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
