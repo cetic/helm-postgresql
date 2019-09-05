@@ -50,3 +50,5 @@ data:
   pgldap-config.yaml: |
 {{ .Values.ldap.pgldapconfig | indent 4}}
 {{- end }}
+
+
