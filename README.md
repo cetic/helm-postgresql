@@ -35,6 +35,9 @@ The following items can be set via `--set` flag during installation or configure
 - **Disable**: The data does not survive the termination of a pod.
 - **Persistent Volume Claim(default)**: A default `StorageClass` is needed in the Kubernetes cluster to dynamic provision the volumes. Specify another StorageClass in the `storageClass` or set `existingClaim` if you have already existing persistent volumes to use.
 
+#### How to use LDAP:
+LDAP is used only to validate the user name/password pairs. Therefore the user must already exist in the database before LDAP can be used for authentication. If you **enable ldap** a **CronJob** will be activated, it will run the tool [pg-ldap-sync](https://github.com/cetic/pg-ldap-sync-docker) that will copy users from your ldap server to your database.
+
 ### Install the chart
 
 Install the postgresql helm chart with a release name `my-release`:
@@ -70,6 +73,7 @@ The following table lists the configurable parameters of the postgresql chart an
 | `postgresql.dataDir`                                                        | PostgreSQL data dir folder                                                                                         | `/var/lib/postgresql/data`      |
 | `postgresql.config`                                                         | Runtime Config Parameters                                                                                          | `nil`                           |
 | `postgresql.pghba`                                                          | Content of pg\_hba.conf                                                                                            | `nil (do not create pg_hba.conf)`|
+| `postgresql.initdbscripts`                                                          | Content of initdbscripts.sh ( commands to be executed at the start of postgres )                                                                                           | `nil (do not create initdbscripts.sh)`|
 | `postgresql.configMap`                                                      | ConfigMap with the PostgreSQL configuration files (Note: Overrides `postgresqlConfiguration` and `pgHbaConfiguration`). The value is evaluated as a template. | `nil`|
 | `extraEnv`                                                                  | Any extra environment variables you would like to pass on to the pod. The value is evaluated as a template.        | `{}`                            |
 | **Service**                                                                 |
@@ -88,6 +92,15 @@ The following table lists the configurable parameters of the postgresql chart an
 | `securityContext.enabled`                                                   | Enable security context                                                                                            | `true`                          |
 | `securityContext.fsGroup`                                                   | Group ID for the container                                                                                         | `1001`                          |
 | `securityContext.runAsUser`                                                 | User ID for the container                                                                                          | `1001`                          |
+| **LDAP**                                                                    |
+| `ldap.enabled`                                                              | Use ldap authentication                                                                                            | `false`                         |
+| `ldap.pgldapconfig`                                                         | pgldap config file                                                                                                 | ``                              |
+| `ldap.cron.schedule`                                                        | Cron job schedule                                                                                                  | `""`                            |
+| `ldap.cron.repo`                                                            | Cron job Docker image                                                                                              | `ceticasbl/pg-ldap-sync`        |
+| `ldap.cron.tag`                                                             | Cron job Docker image tag                                                                                          | `latest`                        |
+| `ldap.cron.restartPolicy`                                                   | Restart policy of the cron job                                                                                     | `Never`                         |
+| `ldap.cron.mountPath`                                                       | Path to mount the volume at                                                                                        | ``                              |
+| `ldap.cron.subPath`                                                         | Subdirectory of the volume to mount at                                                                             | ``                              |
 | **Persistence**                                                             |
 | `persistence.enabled`                                                       | Use persistent volume to store data                                                                                | `false`                         |
 | `persistence.mountPath`                                                     | Path to mount the volume at                                                                                        | `/var/lib/postgresql`           |
