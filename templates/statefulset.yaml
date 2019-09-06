@@ -103,6 +103,12 @@ spec:
           subPath: pg_hba.conf
           readOnly: false
         {{- end }}
+        {{- if or (.Files.Glob "configs/initdbscripts.sh") .Values.postgresql.initdbscripts .Values.configMap }}
+        - name: postgresql-config-initdbscripts
+          mountPath: /docker-entrypoint-initdb.d/initdbscripts.sh
+          subPath: initdbscripts.sh
+          readOnly: false
+        {{- end }}
         {{- if or (.Files.Glob "configs/postgresql.conf") .Values.postgresql.config .Values.configMap }}
         - name: postgresql-config
           mountPath: {{ .Values.persistence.mountPath }}/conf/postgresql.conf
@@ -125,6 +131,14 @@ spec:
           items:
            - key: postgresql.conf
              path: postgresql.conf
+      {{- end }}
+      {{- if or (.Files.Glob "configs/initdbscripts.sh") .Values.postgresql.initdbscripts .Values.postgresql.configMap}}
+      - name: postgresql-config-initdbscripts
+        configMap:
+          name: {{ template "postgresql.fullname" . }}-configuration
+          items:
+           - key: initdbscripts.sh
+             path: initdbscripts.sh
       {{- end }}
 {{- if and .Values.persistence.enabled .Values.persistence.existingClaim }}
       - name: data
