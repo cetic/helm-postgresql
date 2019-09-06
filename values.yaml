@@ -101,7 +101,7 @@ securityContext:
   runAsUser: 1001
 
 ldap:
-  enabled: true
+  enabled: false
   pgldapconfig: |-
     # Reference: https://github.com/larskanis/pg-ldap-sync/blob/master/config/sample-config.yaml
     # Connection parameters to LDAP server
@@ -154,7 +154,6 @@ ldap:
   cron:
     schedule: "*/1 * * * *"
     repo: ceticasbl/pg-ldap-sync
-    #repo: ayadi05/pgldaptest
     tag: latest
     restartPolicy: Never
     mountPath: /workspace
