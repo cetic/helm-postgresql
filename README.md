@@ -85,7 +85,7 @@ The following table lists the configurable parameters of the postgresql chart an
 | **Volume Permissions**                                                      |
 | `volumePermissions.image.registry`                                          | Init container volume-permissions image registry                                                                   | `docker.io`                     |
 | `volumePermissions.image.repository`                                        | Init container volume-permissions image name                                                                       | `debian`                        |
-| `volumePermissions.image.tag`                                               | Init container volume-permissions image tag                                                                        | `latest`                        |
+| `volumePermissions.image.tag`                                               | Init container volume-permissions image tag                                                                        | `buster-slim`                   |
 | `volumePermissions.image.pullPolicy`                                        | Init container volume-permissions image pull policy                                                                | `Always`                        |
 | `volumePermissions.securityContext.runAsUser`                               | User ID for the init container                                                                                     | `0`                             |
 | **Security Context**                                                        |
