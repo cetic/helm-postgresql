@@ -75,7 +75,7 @@ volumePermissions:
   enabled: true
   image:
     registry: docker.io
-    repository: bitnami/minideb
+    repository: debian
     tag: latest
     ## Specify a imagePullPolicy
     ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
