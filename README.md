@@ -84,7 +84,7 @@ The following table lists the configurable parameters of the postgresql chart an
 | `service.annotations`                                                       | Service annotations                                                                                                | `{}`                            |
 | **Volume Permissions**                                                      |
 | `volumePermissions.image.registry`                                          | Init container volume-permissions image registry                                                                   | `docker.io`                     |
-| `volumePermissions.image.repository`                                        | Init container volume-permissions image name                                                                       | `bitnami/minideb`               |
+| `volumePermissions.image.repository`                                        | Init container volume-permissions image name                                                                       | `debian`                        |
 | `volumePermissions.image.tag`                                               | Init container volume-permissions image tag                                                                        | `latest`                        |
 | `volumePermissions.image.pullPolicy`                                        | Init container volume-permissions image pull policy                                                                | `Always`                        |
 | `volumePermissions.securityContext.runAsUser`                               | User ID for the init container                                                                                     | `0`                             |
@@ -122,7 +122,8 @@ The following table lists the configurable parameters of the postgresql chart an
 ## Why this PostgreSQL Helm Chart?
 
 * use postgres official Docker Image.
-* needed LDAP support for the [FADI](https://github.com/cetic/fadi) project. 
+* needed LDAP support for the [FADI](https://github.com/cetic/fadi) project.
+* use this Chart for other architecture (ARM, ...).
 * ...
 
 ## Contributing
