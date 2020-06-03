@@ -41,7 +41,7 @@ postgresql:
   port: 5432
   # initdbArgs 
   # initdbWalDir
-  dataDir: /var/lib/postgresql/data
+  dataDir: /var/lib/postgresql/data/pgdata
 # extraEnv
 
   ## PostgreSQL configuration

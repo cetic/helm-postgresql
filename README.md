@@ -8,7 +8,7 @@ This [Helm](https://github.com/kubernetes/helm) chart installs [postgreSQL](http
 ## Prerequisites
 
 - Kubernetes cluster 1.10+
-- Helm 2.8.0+
+- Helm 3.0.0+
 - PV provisioner support in the underlying infrastructure.
 
 ## Installation
@@ -70,7 +70,7 @@ The following table lists the configurable parameters of the postgresql chart an
 | `postgresql.password`                                                       | postgresql password                                                                                                | `postgres`                      |
 | `postgresql.database`                                                       | postgresql database                                                                                                | `postgres`                      |
 | `postgresql.port`                                                           | postgresql port                                                                                                    | `5432`                          |
-| `postgresql.dataDir`                                                        | PostgreSQL data dir folder                                                                                         | `/var/lib/postgresql/data`      |
+| `postgresql.dataDir`                                                        | PostgreSQL data dir folder                                                                                         | `/var/lib/postgresql/data/pgdata`      |
 | `postgresql.config`                                                         | Runtime Config Parameters                                                                                          | `nil`                           |
 | `postgresql.pghba`                                                          | Content of pg\_hba.conf                                                                                            | `nil (do not create pg_hba.conf)`|
 | `postgresql.initdbscripts`                                                          | Content of initdbscripts.sh ( commands to be executed at the start of postgres )                                                                                           | `nil (do not create initdbscripts.sh)`|
