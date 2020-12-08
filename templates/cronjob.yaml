@@ -17,6 +17,7 @@ spec:
           - name: pg-ldap-sync
             image: {{ .Values.ldap.cron.repo }}:{{ .Values.ldap.cron.tag }}
             args: [ "/workspace/pgldap-config.yaml", "-vv"]
+            imagePullPolicy: IfNotPresent
             volumeMounts:
             - name: pgldap-config
               mountPath: {{ .Values.ldap.cron.mountPath | quote}}
