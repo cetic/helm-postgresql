@@ -11,4 +11,4 @@ jobs:
             - GITHUB_PAGES_REPO: cetic/helm-charts
             - HELM_CHART: postgresql
             - HELM_VERSION: 3.2.1
-          command: wget -O - https://raw.githubusercontent.com/cetic/helm-zabbix/develop/publish.sh | sh
+          command: wget -O - https://raw.githubusercontent.com/cetic/helm-postgresql/develop/publish.sh | sh
