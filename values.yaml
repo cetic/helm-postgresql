@@ -212,3 +212,5 @@ resources: {}
 nodeSelector: {}
 
 tolerations: []
+
+#priorityClassName: "high-priority"
