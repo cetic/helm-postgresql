@@ -115,6 +115,8 @@ spec:
           subPath: postgresql.conf
           readOnly: false
         {{- end }}
+      nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 8 }}
       volumes:
       {{- if or (.Files.Glob "configs/pg_hba.conf") .Values.postgresql.pghba .Values.postgresql.configMap}}
       - name: postgresql-config-pghba
