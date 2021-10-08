@@ -175,6 +175,9 @@ spec:
         {{- range .Values.persistence.accessModes }}
           - {{ . | quote }}
         {{- end }}
+        {{- with .Values.persistence.storageClass }}
+        storageClassName: {{ tpl . $ }}
+        {{- end }}
         resources:
           requests:
             storage: {{ .Values.persistence.size | quote }}
