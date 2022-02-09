@@ -43,7 +43,7 @@ LDAP is used only to validate the user name/password pairs. Therefore the user m
 Install the postgresql helm chart with a release name `my-release`:
 
 ```bash
-helm install --name my-release cetic/postgresql
+helm install my-release cetic/postgresql
 ```
 
 ## Uninstallation
