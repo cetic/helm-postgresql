@@ -1,5 +1,6 @@
 # Helm Chart for PostgreSQL
 [![CircleCI](https://circleci.com/gh/cetic/helm-postgresql.svg?style=svg)](https://circleci.com/gh/cetic/helm-postgresql/tree/master) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0) ![version](https://img.shields.io/github/tag/cetic/helm-postgresql.svg?label=release)
+![test](https://github.com/cetic/helm-postgresql/actions/workflows/basic_test.yml/badge.svg)
 
 ## Introduction
 
