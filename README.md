@@ -120,6 +120,8 @@ The following table lists the configurable parameters of the postgresql chart an
 | **tolerations**                                                             |
 | `tolerations`                                                               | Tolerations for pod assignment                                                                                     | `[]`                            |
 
+| **priorityClass**                                                             |
+| `priorityClassName`                                                         | PriorityClassName for pod assignment                                                                               | `nil`                           |
 ## Why this PostgreSQL Helm Chart?
 
 * use postgres official Docker Image.
