@@ -1,0 +1,45 @@
+name: Test
+
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master
+
+jobs:
+  example:
+    name: Minikube installation - Basic test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup Minikube
+        uses: manusa/actions-setup-minikube@v2.7.2
+        with:
+          minikube version: 'v1.28.0'
+          kubernetes version: 'v1.25.4'
+          github token: ${{ secrets.GITHUB_TOKEN }}
+      #- run: minikube addons list
+      #- name: Interact with the cluster
+      #  run: kubectl get nodes
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Install PostgreSQL
+        run: helm install postgresql .
+      - name: Check deployment status
+        run: |
+          kubectl rollout status --watch statefulset/postgresql --timeout=5m
+      - name: Wait for PostgreSQL database to start
+        run: |
+          for n in [ 0 1 2 3 4 5 6 7 8 9 ]
+          do
+            if kubectl logs pod/postgresql-0 | grep 'database system is ready to accept connections'
+            then
+              exit 0
+            fi
+            sleep 30
+          done
+          echo PostgreSQL did not start within 300 seconds!
+          exit 1

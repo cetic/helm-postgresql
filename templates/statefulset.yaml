@@ -117,6 +117,17 @@ spec:
           subPath: postgresql.conf
           readOnly: false
         {{- end }}
+      {{- if .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 8 }}
+      {{- end }}
+      {{- if .Values.nodeName }}
+      nodeName: {{ .Values.nodeName | quote }}
+      {{- end }}
+      {{- if .Values.affinity }}
+      affinity:
+{{ toYaml .Values.affinity | indent 8 }}
+      {{- end }}
       volumes:
       {{- if or (.Files.Glob "configs/pg_hba.conf") .Values.postgresql.pghba .Values.postgresql.configMap}}
       - name: postgresql-config-pghba
@@ -165,6 +176,9 @@ spec:
         accessModes:
         {{- range .Values.persistence.accessModes }}
           - {{ . | quote }}
+        {{- end }}
+        {{- with .Values.persistence.storageClass }}
+        storageClassName: {{ tpl . $ }}
         {{- end }}
         resources:
           requests:
