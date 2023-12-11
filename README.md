@@ -119,7 +119,6 @@ The following table lists the configurable parameters of the postgresql chart an
 | `nodeSelector`                                                              | Node labels for pod assignment                                                                                     | `{}`                            |
 | **tolerations**                                                             |
 | `tolerations`                                                               | Tolerations for pod assignment                                                                                     | `[]`                            |
-
 | **priorityClass**                                                             |
 | `priorityClassName`                                                         | PriorityClassName for pod assignment                                                                               | `nil`                           |
 ## Why this PostgreSQL Helm Chart?
